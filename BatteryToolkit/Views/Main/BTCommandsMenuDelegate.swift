@@ -110,6 +110,11 @@ internal final class BTCommandsMenuDelegate: NSObject, NSMenuDelegate {
             }
             
             self.infoUnknownStateItem.isHidden = true
+            if let sustainedCharge = state[BTStateInfo.Keys.sustainedCharge] as? NSNumber {
+                self.infoNotChargingItem.title = "Sustaining near \(sustainedCharge.intValue) %"
+            } else {
+                self.infoNotChargingItem.title = "Charging On Hold"
+            }
             
             if !powerDisabled {
                 self.infoPowerAdapterDisabledItem.isHidden = true

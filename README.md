@@ -62,12 +62,19 @@ upper threshold to **80%**, and leave the power adapter enabled. Charging
 limits do not issue an adapter-disable command. The firmware enforces the
 range during sleep, and the daemon checks it on wake and while running.
 
+If the battery is already above 80%, the app automatically sustains near its
+current level: for example, 87% becomes a temporary ceiling. It does not
+change the configured 80% limit. After natural battery use brings the charge
+back to 80% or below, the normal 30–80% range takes over again. Manual
+charge-to-limit and charge-to-full commands remain available.
+
 > [!IMPORTANT]
 > The replacement controls are not identical to the old charging switch:
-> firmware may actively discharge a battery that is already above the upper
-> limit. An exact “hold the current charge without discharging” behavior is
-> not guaranteed. The full 30–80% cycle and sleep behavior have not yet been
-> verified on hardware. See [compatibility and validation notes](Docs/macOS-15.8.md).
+> firmware may briefly charge or discharge while settling around the sustain
+> target. An exact, constant displayed percentage and zero battery current
+> are not guaranteed. Sustaining near 87%, the full 30–80% cycle and sleep
+> behavior still need hardware validation. See
+> [compatibility and validation notes](Docs/macOS-15.8.md).
 
 The upstream downloads below do **not** include this fork's changes. To use
 them, [build this fork](Docs/macOS-15.8.md#building-the-app) with Xcode and your

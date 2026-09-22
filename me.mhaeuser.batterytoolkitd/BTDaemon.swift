@@ -35,7 +35,7 @@ internal enum BTDaemon {
         let mode = BTPowerEvents.chargingMode
         let maxCharge = BTSettings.maxCharge
 
-        return [
+        var state: [String: NSObject & Sendable] = [
             BTStateInfo.Keys.enabled: NSNumber(value: 1),
             BTStateInfo.Keys.powerDisabled: NSNumber(value: powerDisabled),
             BTStateInfo.Keys.connected: NSNumber(value: connected),
@@ -45,6 +45,10 @@ internal enum BTDaemon {
             BTStateInfo.Keys.chargingMode: NSNumber(value: mode.rawValue),
             BTStateInfo.Keys.maxCharge: NSNumber(value: maxCharge)
         ]
+        if let sustainedCharge = BTPowerEvents.sustainedCharge {
+            state[BTStateInfo.Keys.sustainedCharge] = NSNumber(value: sustainedCharge)
+        }
+        return state
     }
     
     private static func start() throws {

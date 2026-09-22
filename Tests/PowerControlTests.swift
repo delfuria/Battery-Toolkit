@@ -10,9 +10,12 @@ enum PowerControlTests {
         checks += 1
         precondition(condition(), message, file: file, line: line)
     }
-    static func range(_ lower: UInt8, _ upper: UInt8) {
+    static func range(_ lower: UInt8, _ upper: UInt8,
+                      file: StaticString = #file, line: UInt = #line) {
         expect(SMCComm.Power.firmwareChargeLimit() ==
-            .init(active: true, lower: lower, upper: upper), "Expected range \(lower)–\(upper)")
+            .init(active: true, lower: lower, upper: upper),
+            "Expected range \(lower)–\(upper), got \(String(describing: SMCComm.Power.firmwareChargeLimit()))",
+            file: file, line: line)
     }
     static func percentage(_ percent: UInt8, charging: Bool = false) {
         IOPSPrivate.reading = (percent, charging, percent == 100)
@@ -116,6 +119,98 @@ enum PowerControlTests {
         BTPowerEvents.stop()
         expect(SMCComm.values["bfF0"] == [0], "Pause removes range even if battery was charging")
         expect(GlobalSleep.count == 0, "No leaked sleep override")
+
+        // Restore the old app's above-limit behavior without draining to 80%.
+        SMCComm.fixture()
+        IOPSPrivate.reading = (87, false, false)
+        GlobalSleep.disables = 0
+        try BTPowerEvents.start()
+        range(30, 87)
+        expect(BTPowerEvents.sustainedCharge == 87, "Expose the actual sustain target")
+        expect(BTSettings.maxCharge == 80, "Sustain must not change the configured limit")
+        SMCComm.writes = []
+        percentage(88, charging: true)
+        range(30, 87)
+        expect(SMCComm.writes.isEmpty, "Never chase an overshoot upwards")
+        percentage(86)
+        range(30, 87)
+        expect(SMCComm.writes.isEmpty, "Do not repeatedly lower the ceiling on AC")
+
+        SMCComm.values["bfF0"] = [0]
+        percentage(88, charging: true)
+        range(30, 87)
+        BTPowerEvents.wakeFromSleep()
+        range(30, 87)
+        expect(GlobalSleep.disables == 0, "Sustain must not disable normal sleep")
+
+        // On battery, the temporary ceiling follows natural discharge down.
+        IOPSPrivate.external = false
+        percentage(85)
+        range(30, 85)
+        IOPSPrivate.external = true; BTDispatcher.power?(0)
+        range(30, 85)
+        percentage(80)
+        range(30, 80)
+        expect(BTPowerEvents.sustainedCharge == nil, "Return to the normal range at 80")
+        percentage(29)
+        range(30, 80)
+        percentage(81, charging: true)
+        range(30, 80)
+        expect(BTPowerEvents.sustainedCharge == nil, "Normal charging still ends at 80")
+
+        // Replug may arrive as a percentage notification before the power event.
+        IOPSPrivate.external = false; percentage(90)
+        IOPSPrivate.external = true; percentage(90)
+        range(30, 90)
+        percentage(87)
+        expect(BTPowerEvents.disableCharging(), "Manual stop above the limit")
+        range(30, 87)
+        expect(BTPowerEvents.chargeToLimit(), "Charge-to-limit above the limit must not force discharge")
+        range(30, 87)
+        expect(BTPowerEvents.chargeToFull(), "Full charge overrides sustain")
+        expect(BTPowerEvents.sustainedCharge == nil, "Hide inactive sustain during full charge")
+        expect(SMCComm.values["bfF0"] == [0], "Release sustain for full charge")
+        expect(BTPowerEvents.disableCharging(), "Cancel full charge at the current level")
+        range(30, 87)
+        percentage(79)
+        expect(BTPowerEvents.chargeToLimit(), "Explicit 80% charge after sustain")
+        range(79, 80)
+        percentage(80)
+        range(30, 80)
+
+        percentage(87)
+        BTSettings.maxCharge = 70
+        BTPowerEvents.settingsChanged()
+        range(30, 87)
+        expect(BTSettings.maxCharge == 70, "Lowering the configured limit must not force discharge")
+        expect(SMCComm.writes.allSatisfy { !$0.0.hasPrefix("CH") }, "Sustain never disables the adapter")
+        BTPowerEvents.stop()
+        expect(SMCComm.values["bfF0"] == [0], "Pause releases sustain")
+
+        // Simulate a fresh daemon with an already-installed hold and a slightly
+        // higher reading while the hardware is settling.
+        BTPowerEvents.settingsChanged()
+        SMCComm.fixture()
+        IOPSPrivate.reading = (88, false, false)
+        SMCComm.values["bfF0"] = [2]
+        SMCComm.values["bfD0"] = [87, 0, 0, 0]
+        SMCComm.values["bfE0"] = [30, 0, 0, 0]
+        try BTPowerEvents.start()
+        range(30, 87)
+        expect(SMCComm.writes.isEmpty, "Restart preserves the installed sustain ceiling")
+        BTPowerEvents.stop()
+
+        // A failed first sustain update must never be advertised as active.
+        BTPowerEvents.settingsChanged()
+        SMCComm.fixture()
+        IOPSPrivate.reading = (87, false, false)
+        SMCComm.failWrite = 2
+        do {
+            try BTPowerEvents.start()
+            preconditionFailure("Start should report the failed sustain write")
+        } catch BTError.unknown {}
+        expect(BTPowerEvents.sustainedCharge == nil, "Do not report an uninstalled sustain target")
+        expect(SMCComm.values["bfF0"] == [0], "Failed sustain startup restores inactive state")
 
         // Both existing firmware generations retain software hysteresis.
         for legacy in ["CHTE", "CH0C"] {

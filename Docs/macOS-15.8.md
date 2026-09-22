@@ -29,10 +29,35 @@ Manual charge-to-limit temporarily raises the lower bound to just below the
 upper bound. Charge-to-full temporarily clears the range; once full, it
 holds a 100% upper bound until charge naturally falls back into the normal
 range. Manual stop installs a fixed upper target at the current percentage
-(capped at the configured maximum). As with automatic limits, the firmware
-may discharge toward that target rather than immediately hold the charge.
+(including above the configured maximum). As with automatic limits, the
+firmware may need time to settle around that target.
 Equal lower/upper settings use a one-percentage-point band, since the firmware
 requires the lower bound to be strictly below the upper bound.
+
+## Automatic sustain above the configured limit
+
+To approximate the legacy app's behavior, the daemon captures the current
+percentage as a temporary ceiling when starting, waking, reconnecting power,
+or changing settings above the configured maximum. For a configured 30–80%
+range, starting at 87% therefore installs a 30–87% range instead of immediately
+asking the firmware to discharge toward 80%.
+
+The configured maximum remains 80%. Ordinary percentage notifications cannot
+raise the captured ceiling if charging briefly overshoots. While disconnected
+from power, the temporary ceiling follows natural battery use downward. When
+charge falls to 80% or below, the normal 30–80% range resumes. This is not a
+request to top up to 87% whenever charge falls by one percent.
+
+An installed sustain ceiling survives a daemon restart, and the menu reports
+“Sustaining near 87 %” when charging is on hold with that verified target.
+Manual full charging releases the ceiling; stopping it captures the current
+level again. Requesting charge-to-limit when already above the limit sustains
+the current level rather than initiating discharge.
+
+Sustain is a firmware target, not a guarantee of an electrically inactive
+battery or an exactly constant displayed percentage. A small charge/discharge
+adjustment while the firmware settles is possible. The software policy is
+covered by regression checks; an 87% hardware hold remains to be verified.
 
 ## Adapter power and clamshell mode
 
@@ -41,10 +66,12 @@ adapter enabled. The new charging path never writes the adapter-disable keys
 (`CHIE`/`CH0J`). Existing explicit adapter commands still work separately.
 
 However, the firmware can itself discharge a battery that starts above the
-upper limit. In the hardware test below, macOS continued reporting external
-power connected and charge-capable while the battery current became negative.
-This differs from the old charging-inhibit switch. Do not equate an active
-range, or an adapter-connected flag, with zero battery current.
+programmed upper limit. In the hardware test below, which explicitly installed
+80% at a displayed 96%, macOS continued reporting external power connected and
+charge-capable while battery current became negative. Automatic sustain now
+avoids that deliberate 96-to-80% request by capturing the current level instead.
+Do not equate an active range, or an adapter-connected flag, with zero battery
+current.
 
 Holding an arbitrary above-limit percentage without discharging is not
 established. A second test at a displayed 97% with a 30–96% range continued
@@ -64,7 +91,8 @@ On the M4 Max / macOS 15.8 machine:
 - Both old charging keys were missing; all three new keys were readable and
   writable with administrator privileges.
 - The complete daemon compiled and linked using Swift 6 and the Command Line
-  Tools. The GUI app has not been built or installed.
+  Tools. After installing Xcode 26.3, the complete Release GUI app also built
+  successfully with signing disabled. It has not been signed or installed.
 - The production firmware backend accepted and read back a 30–80% range.
   During the 30-second test at 96%, `IsCharging` changed from true to false,
   current changed from +2561 mA to -2180 mA, and `ExternalConnected` and
@@ -72,8 +100,9 @@ On the M4 Max / macOS 15.8 machine:
 - Both hardware tests restored the original three firmware keys and the
   previous system sleep setting. No helper was installed by the tests.
 
-Still requiring hardware validation: stopping near 80%, restarting below
-30%, sustained adapter-only operation within the band, unplug/replug,
+Still requiring hardware validation: sustaining an above-limit level such as
+87%, stopping near 80%, restarting below 30%, sustained adapter-only operation
+within the band, unplug/replug,
 closed-lid sleep/wake, and reboot. Automated tests exercise control decisions
 and failures; they do not simulate the firmware's electrical behavior.
 
@@ -87,7 +116,9 @@ The tests compile the production power backend, state tracker and event loop
 with substitutes for hardware, preferences, notifications and sleep changes.
 They cover capability detection, legacy hysteresis, write order and encoding,
 rollback, read failures, idempotence, wake recovery, manual commands, adapter
-isolation and sleep accounting.
+isolation and sleep accounting. Sustain cases additionally cover an 87% start,
+overshoot, natural discharge, replug notification ordering, changing limits,
+restart recovery and failed writes.
 
 Build the diagnostic tool using only the Command Line Tools:
 
@@ -109,6 +140,8 @@ when finished or interrupted with SIGINT/SIGTERM. Do not force-kill the test:
 SIGKILL or a machine crash prevents cleanup. Charging status can take time to
 refresh after settings are restored. This tool is a diagnostic, not a
 replacement for the installed app or a persistent background service.
+Unlike the app's automatic policy, `--test-limit` applies exactly the supplied
+range; it does not substitute a sustain ceiling when charge is above the limit.
 
 ## Building the app
 
@@ -116,6 +149,21 @@ The GUI requires full Xcode with a Swift 6 toolchain; Command Line Tools alone
 do not include the storyboard and asset compilers. This project's privileged
 helper also authenticates the app using an Apple Development certificate.
 Ad-hoc signing is not sufficient for the existing XPC security checks.
+
+If Xcode is installed but `xcode-select -p` still reports Command Line Tools,
+select it for a particular build using `DEVELOPER_DIR`. For example, the
+following verifies compilation with the installed Xcode 26.3 without changing
+the global developer directory or requiring a signing identity:
+
+```sh
+DEVELOPER_DIR=/Applications/Xcode-26.3.0.app/Contents/Developer \
+  xcodebuild -project 'Battery Toolkit.xcodeproj' -scheme 'Battery Toolkit' \
+  -configuration Release -derivedDataPath build/sustain-derivedData \
+  -destination 'generic/platform=macOS' \
+  CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build
+```
+
+That produces an unsigned build for validation. To build an installable app:
 
 1. Open `Battery Toolkit.xcodeproj` in Xcode.
 2. Configure your own development team and Apple Development signing identity
