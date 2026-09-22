@@ -48,6 +48,31 @@ The Battery Toolkit "Commands" menu and its menu bar extra allow you to issue va
 > [!IMPORTANT]
 > Battery Toolkit currently only supports Apple Silicon Macs [#15](https://github.com/mhaeuser/Battery-Toolkit/issues/15)
 
+### macOS 15.8 compatibility in this fork
+
+Some firmware updates installed with macOS 15.8 remove the charging switches
+used by Battery Toolkit 1.8, causing “Your Mac is not supported.” This fork
+detects the replacement firmware charge-limit controls and supports a lower
+and upper charging threshold through them. Older charging controls remain
+supported. Compatibility depends on the controls actually accessible on the
+Mac, not just its macOS version.
+
+For a 30–80% setup, set **Turn battery charging on below** to **30%** and the
+upper threshold to **80%**, and leave the power adapter enabled. Charging
+limits do not issue an adapter-disable command. The firmware enforces the
+range during sleep, and the daemon checks it on wake and while running.
+
+> [!IMPORTANT]
+> The replacement controls are not identical to the old charging switch:
+> firmware may actively discharge a battery that is already above the upper
+> limit. An exact “hold the current charge without discharging” behavior is
+> not guaranteed. The full 30–80% cycle and sleep behavior have not yet been
+> verified on hardware. See [compatibility and validation notes](Docs/macOS-15.8.md).
+
+The upstream downloads below do **not** include this fork's changes. To use
+them, [build this fork](Docs/macOS-15.8.md#building-the-app) with Xcode and your
+own Apple Development signing identity.
+
 ### Manual Install
 1. Go to the GitHub [releases](https://github.com/mhaeuser/Battery-Toolkit/releases/latest) page
 2. Download the latest non-dSYM build (i.e., `Battery-Toolkit-X.Y.zip`)
@@ -106,7 +131,12 @@ If you want to change any settings, simply re-open the app.
 
 # Limitations
 
-Battery Toolkit disables sleep while it is charging, because it has to actively disable charging once reaching the maximum. Sleep is re-enabled once charging is stopped for any reason, e.g., reaching the maximum charge level, manual cancellation, or unplugging the MacBook.
+On older firmware, Battery Toolkit disables sleep while it is charging,
+because it has to actively disable charging once reaching the maximum. Sleep
+is re-enabled once charging is stopped for any reason, e.g., reaching the
+maximum charge level, manual cancellation, or unplugging the MacBook. On
+firmware with native charge-limit controls, the firmware enforces the range
+and Battery Toolkit does not need to disable sleep for charging.
 
 Apps, including Battery Toolkit, cannot control the charge state when the machine is shut down. If the charger remains plugged in while the Mac is off, the battery will charge to 100&nbsp;%.
 
@@ -125,6 +155,9 @@ Note that sleep should usually be disabled when the power adapter is disabled, a
 # Credits
 * Icon based on [reference icon by Streamline](https://seekicon.com/free-icon/rechargable-battery_1)
 * README overhauled by [rogue](https://github.com/realrogue)
+* Replacement firmware charge-limit protocol investigated by
+  [ashwinr64](https://github.com/actuallymentor/battery/pull/469) and documented
+  in [batt](https://github.com/charlie0129/batt/blob/master/pkg/smc/charging.go)
 
 # Donate
 For various reasons, I will not accept personal donations. However, if you would like to support my work with the [Kinderschutzbund Kaiserslautern-Kusel](https://www.kinderschutzbund-kaiserslautern.de/) child protection association, you may donate [here](https://www.kinderschutzbund-kaiserslautern.de/helfen-sie-mit/spenden/).
