@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "CE52867228298B6D00860C7B"
-               BuildableName = "Battery Toolkit.app"
+               BuildableName = "Battery Toolkit Next.app"
                BlueprintName = "Battery Toolkit"
                ReferencedContainer = "container:Battery Toolkit.xcodeproj">
             </BuildableReference>
@@ -47,7 +47,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "CE52867228298B6D00860C7B"
-            BuildableName = "Battery Toolkit.app"
+            BuildableName = "Battery Toolkit Next.app"
             BlueprintName = "Battery Toolkit"
             ReferencedContainer = "container:Battery Toolkit.xcodeproj">
          </BuildableReference>
@@ -71,7 +71,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "CE52867228298B6D00860C7B"
-            BuildableName = "Battery Toolkit.app"
+            BuildableName = "Battery Toolkit Next.app"
             BlueprintName = "Battery Toolkit"
             ReferencedContainer = "container:Battery Toolkit.xcodeproj">
          </BuildableReference>

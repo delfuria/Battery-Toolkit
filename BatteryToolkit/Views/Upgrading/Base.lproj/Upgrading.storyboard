@@ -10,7 +10,7 @@
         <scene sceneID="gb5-bB-HuN">
             <objects>
                 <windowController showSeguePresentationStyle="single" id="Cb8-W0-8gz" sceneMemberID="viewController">
-                    <window key="window" title="Battery Toolkit Upgrade" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="LWN-3i-ZL8">
+                    <window key="window" title="Battery Toolkit Next Upgrade" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="LWN-3i-ZL8">
                         <windowStyleMask key="styleMask" titled="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="425" y="462" width="480" height="270"/>
@@ -44,7 +44,7 @@
                                 <constraints>
                                     <constraint firstAttribute="width" constant="288" id="Och-gx-3j6"/>
                                 </constraints>
-                                <textFieldCell key="cell" selectable="YES" alignment="center" title="Upgrading Battery Toolkit to improve reliability. This process may take several minutes." id="zRQ-jJ-oCI">
+                                <textFieldCell key="cell" selectable="YES" alignment="center" title="Upgrading Battery Toolkit Next to improve reliability. This process may take several minutes." id="zRQ-jJ-oCI">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>

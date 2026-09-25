@@ -28,6 +28,9 @@ extern const NSString *const BT_AUTOSTART_ID;
 /// The Battery Toolkit codesign Common Name.
 extern const NSString *const BT_CODESIGN_CN;
 
+/// The OID of the Battery Toolkit codesign intermediate certificate.
+extern const NSString *const BT_CODESIGN_CA_OID;
+
 __END_DECLS
 
 #endif

@@ -315,7 +315,7 @@
                                             <subviews>
                                                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="WLE-5m-DuI" userLabel="Autostart Label">
                                                     <rect key="frame" x="18" y="71" width="415" height="16"/>
-                                                    <textFieldCell key="cell" lineBreakMode="clipping" title="Open Battery Toolkit automatically when you log in to your Mac" id="23Z-ec-mgU">
+                                                    <textFieldCell key="cell" lineBreakMode="clipping" title="Open Battery Toolkit Next automatically when you log in to your Mac" id="23Z-ec-mgU">
                                                         <font key="font" usesAppearanceFont="YES"/>
                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>

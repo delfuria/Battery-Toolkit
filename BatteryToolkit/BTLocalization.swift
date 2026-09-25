@@ -43,12 +43,12 @@ internal enum BTLocalization {
         )
 
         static let quitMessage = NSLocalizedString(
-            "Quit Battery Toolkit?",
+            "Quit Battery Toolkit Next?",
             comment: "Prompt caption asking whether to quit the app"
         )
 
         static let quitInfo = NSLocalizedString(
-            "Battery Toolkit will continue to run in the background. To permanently suspend it, disable the background activity from the Battery Toolkit menu.",
+            "Battery Toolkit Next will continue to run in the background. To permanently suspend it, disable the background activity from the Battery Toolkit Next menu.",
             comment: "Prompt caption asking whether to quit the app"
         )
 
@@ -69,7 +69,7 @@ internal enum BTLocalization {
 
         enum Daemon {
             static let requiredInfo = NSLocalizedString(
-                "To manage the power state of your Mac, Battery Toolkit needs to run in the background.",
+                "To manage the power state of your Mac, Battery Toolkit Next needs to run in the background.",
                 comment: "Prompt text explaining the requirement for background activity"
             )
 
@@ -79,7 +79,7 @@ internal enum BTLocalization {
             )
 
             static let allowInfo = NSLocalizedString(
-                "Do you want to approve the Battery Toolkit Login Item in System Settings?",
+                "Do you want to approve the Battery Toolkit Next Login Item in System Settings?",
                 comment: "Prompt text asking to approve background activity"
             )
 
@@ -94,7 +94,7 @@ internal enum BTLocalization {
             )
 
             static let disableInfo = NSLocalizedString(
-                "Do you want to disable background activity for Battery Toolkit?",
+                "Do you want to disable background activity for Battery Toolkit Next?",
                 comment: "Prompt text asking whether to disable background activity"
             )
 
@@ -119,7 +119,7 @@ internal enum BTLocalization {
             )
 
             static let unsupportedInfo = NSLocalizedString(
-                "Battery Toolkit does not support managing the power state of your Mac. Background activity will be disabled.",
+                "Battery Toolkit Next does not support managing the power state of your Mac. Background activity will be disabled.",
                 comment: "Prompt text informing the user the app does not support this machine and that background activity will be disabled in response"
             )
         }

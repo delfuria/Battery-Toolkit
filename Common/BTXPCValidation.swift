@@ -152,7 +152,7 @@ internal enum BTXPCValidation {
         let debugText = "identifier \"" + identifier + "\"" +
             " and anchor apple generic" +
             " and certificate leaf[subject.CN] = \"" + BT_CODESIGN_CN + "\"" +
-            " and certificate 1[field.1.2.840.113635.100.6.2.1] /* exists */" +
+            " and certificate 1[field." + BT_CODESIGN_CA_OID + "] /* exists */" +
             " and !(entitlement[\"com.apple.security.cs.allow-dyld-environment-variables\"] /* exists */)" +
             " and !(entitlement[\"com.apple.security.cs.disable-library-validation\"] /* exists */)" +
             " and !(entitlement[\"com.apple.security.cs.allow-unsigned-executable-memory\"] /* exists */)" +

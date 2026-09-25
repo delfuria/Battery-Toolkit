@@ -183,7 +183,7 @@
 		CE37DD0D283F86F90060C43F /* SMCComm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SMCComm.swift; sourceTree = "<group>"; };
 		CE37DD0F284164160060C43F /* SMCComm+Power.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SMCComm+Power.swift"; sourceTree = "<group>"; };
 		CE39744B2859E6D3002D0EC9 /* com.delfuria.batterytoolkitd */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = com.delfuria.batterytoolkitd; sourceTree = BUILT_PRODUCTS_DIR; };
-		CE39744C285A1D35002D0EC9 /* Battery Toolkit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Battery Toolkit.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		CE39744C285A1D35002D0EC9 /* Battery Toolkit Next.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Battery Toolkit Next.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE39746D285A229F002D0EC9 /* BTActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTActions.swift; sourceTree = "<group>"; };
 		CE397471285A2396002D0EC9 /* BTDaemonXPCServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTDaemonXPCServer.swift; sourceTree = "<group>"; };
 		CE397477285A25A1002D0EC9 /* BTDaemonXPCClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTDaemonXPCClient.swift; sourceTree = "<group>"; };
@@ -343,7 +343,7 @@
 				CE9BD24628E8908000B6C61D /* AutostartHelper.app */,
 				CEECE31828BB648F00821A3B /* Battery Toolkit Service.xpc */,
 				CE39744B2859E6D3002D0EC9 /* com.delfuria.batterytoolkitd */,
-				CE39744C285A1D35002D0EC9 /* Battery Toolkit.app */,
+				CE39744C285A1D35002D0EC9 /* Battery Toolkit Next.app */,
 			);
 			sourceTree = "<group>";
 		};
@@ -568,7 +568,7 @@
 			);
 			name = "Battery Toolkit";
 			productName = BatteryToolkit;
-			productReference = CE39744C285A1D35002D0EC9 /* Battery Toolkit.app */;
+			productReference = CE39744C285A1D35002D0EC9 /* Battery Toolkit Next.app */;
 			productType = "com.apple.product-type.application";
 		};
 		CE9BD24528E8908000B6C61D /* AutostartHelper */ = {
@@ -877,6 +877,7 @@
 				BT_APP_ID = com.delfuria.BatteryToolkit;
 				BT_AUTOSTART_ID = com.delfuria.BatteryToolkitAutostart;
 				BT_CODESIGN_CN = "Apple Development: Stefano Del Furia (G2686Y5924)";
+				BT_CODESIGN_CA_OID = 1.2.840.113635.100.6.2.1;
 				BT_DAEMON_CONN = VZWMBQL256.com.delfuria.batterytoolkitd;
 				BT_DAEMON_ID = com.delfuria.batterytoolkitd;
 				BT_SERVICE_ID = com.delfuria.BatteryToolkitService;
@@ -937,7 +938,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1.9;
+				CURRENT_PROJECT_VERSION = 2.0;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = VZWMBQL256;
@@ -962,6 +963,7 @@
 					"\"BT_DAEMON_ID_=\\\"$(BT_DAEMON_ID)\\\"\"",
 					"\"BT_DAEMON_CONN_=\\\"$(BT_DAEMON_CONN)\\\"\"",
 					"\"BT_CODESIGN_CN_=\\\"$(BT_CODESIGN_CN)\\\"\"",
+					"\"BT_CODESIGN_CA_OID_=\\\"$(BT_CODESIGN_CA_OID)\\\"\"",
 					"\"BT_SERVICE_ID_=\\\"$(BT_SERVICE_ID)\\\"\"",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
@@ -991,7 +993,7 @@
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 Marvin Häuser. All rights reserved.";
 				LLVM_LTO = YES_THIN;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.9;
+				MARKETING_VERSION = 2.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CODE_SIGN_FLAGS = "-o hard,kill,restrict,enforce,library-validation,library,runtime";
@@ -1013,7 +1015,8 @@
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				BT_APP_ID = com.delfuria.BatteryToolkit;
 				BT_AUTOSTART_ID = com.delfuria.BatteryToolkitAutostart;
-				BT_CODESIGN_CN = "Apple Development: Stefano Del Furia (G2686Y5924)";
+				BT_CODESIGN_CN = "Developer ID Application: Stefano Del Furia (VZWMBQL256)";
+				BT_CODESIGN_CA_OID = 1.2.840.113635.100.6.2.6;
 				BT_DAEMON_CONN = VZWMBQL256.com.delfuria.batterytoolkitd;
 				BT_DAEMON_ID = com.delfuria.batterytoolkitd;
 				BT_SERVICE_ID = com.delfuria.BatteryToolkitService;
@@ -1071,10 +1074,12 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CLANG_WARN__EXIT_TIME_DESTRUCTORS = YES;
-				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1.9;
+				CURRENT_PROJECT_VERSION = 2.0;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = VZWMBQL256;
@@ -1097,6 +1102,7 @@
 					"\"BT_DAEMON_ID_=\\\"$(BT_DAEMON_ID)\\\"\"",
 					"\"BT_DAEMON_CONN_=\\\"$(BT_DAEMON_CONN)\\\"\"",
 					"\"BT_CODESIGN_CN_=\\\"$(BT_CODESIGN_CN)\\\"\"",
+					"\"BT_CODESIGN_CA_OID_=\\\"$(BT_CODESIGN_CA_OID)\\\"\"",
 					"\"BT_SERVICE_ID_=\\\"$(BT_SERVICE_ID)\\\"\"",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
@@ -1126,9 +1132,9 @@
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 Marvin Häuser. All rights reserved.";
 				LLVM_LTO = YES_THIN;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.9;
+				MARKETING_VERSION = 2.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				OTHER_CODE_SIGN_FLAGS = "-o hard,kill,restrict,enforce,library-validation,library,runtime";
+				OTHER_CODE_SIGN_FLAGS = "-o hard,kill,restrict,enforce,library-validation,library,runtime --timestamp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx;
@@ -1151,6 +1157,8 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSMainStoryboardFile = Main;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				PRODUCT_MODULE_NAME = Battery_Toolkit;
+				PRODUCT_NAME = "Battery Toolkit Next";
 				PRODUCT_BUNDLE_IDENTIFIER = com.delfuria.BatteryToolkit;
 			};
 			name = Debug;
@@ -1166,6 +1174,8 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSMainStoryboardFile = Main;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				PRODUCT_MODULE_NAME = Battery_Toolkit;
+				PRODUCT_NAME = "Battery Toolkit Next";
 				PRODUCT_BUNDLE_IDENTIFIER = com.delfuria.BatteryToolkit;
 			};
 			name = Release;
