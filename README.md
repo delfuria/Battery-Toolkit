@@ -69,6 +69,14 @@ The Battery Toolkit Next "Commands" menu and its menu bar extra allow you to iss
 > [!IMPORTANT]
 > Battery Toolkit Next only supports Apple Silicon Macs.
 
+### Install via Homebrew :beer:
+1. Install [Homebrew](https://brew.sh) if you haven't already
+2. Open Terminal and run `brew tap delfuria/tap`
+3. Run `brew install --cask battery-toolkit-next`
+
+Update with `brew upgrade --cask battery-toolkit-next`.
+
+### Install manually
 1. Go to the GitHub [releases](https://github.com/delfuria/Battery-Toolkit-Next/releases/latest) page
 2. Download the latest non-dSYM build (i.e., `Battery-Toolkit-Next-X.Y.zip`)
 3. Unzip the archive
@@ -82,6 +90,9 @@ If the original Battery Toolkit is installed, remove it first:
 1. Open Battery Toolkit
 2. Choose "Disable Background Activity" from its main menu
 3. Quit it and move `Battery Toolkit.app` to the Trash
+
+If it was installed via Homebrew, run `brew uninstall --cask battery-toolkit`
+instead of moving it to the Trash.
 
 Settings are not migrated, because Battery Toolkit Next uses different
 identifiers. Configure the limits again after installing.
@@ -137,6 +148,10 @@ If you want to change any settings, simply re-open the app.
 2. Open the main Battery Toolkit Next menu in the menu bar (see **Fig. 3**)
 3. Choose "Disable Background Activity"
 4. Move the app to the Trash and empty it
+
+If you installed it via Homebrew, run
+`brew uninstall --cask battery-toolkit-next` instead of step 4. Add `--zap` to
+also remove its settings.
 
 # Limitations
 
