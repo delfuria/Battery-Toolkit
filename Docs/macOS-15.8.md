@@ -59,6 +59,22 @@ battery or an exactly constant displayed percentage. A small charge/discharge
 adjustment while the firmware settles is possible. The software policy is
 covered by regression checks; an 87% hardware hold remains to be verified.
 
+## No new charging session above the minimum
+
+The firmware does not reproduce the legacy switch's hysteresis: whenever a
+range is (re)installed, e.g. on daemon start or after a reboot, it charges
+towards the upper bound even when the battery is already above the lower one.
+With a 20–83% range, a Mac connected at 42% therefore charged to 83%, while the
+legacy app would only have resumed charging below 20%.
+
+The capture described above therefore applies to every level at or above the
+configured minimum, not only above the maximum. Starting, waking, reconnecting
+power or changing settings at 42% installs a 20–42% range. Once charge falls
+below the minimum, the normal 20–83% range is installed and the resumed charge
+continues to 83%, also across wake and settings changes, as with the legacy
+switch. Reconnecting power ends a resumed charge, again as before. The menu
+shows “Sustaining near …” only for holds above the configured maximum.
+
 ## Adapter power and clamshell mode
 
 For 30–80% operation, set the app's thresholds to 30 and 80 and keep the power

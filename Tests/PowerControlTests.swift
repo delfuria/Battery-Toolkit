@@ -62,25 +62,48 @@ enum PowerControlTests {
         SMCComm.fixture()
         GlobalSleep.disables = 0
         try BTPowerEvents.start()
-        range(30, 80)
+        range(30, 60)
+        expect(BTPowerEvents.sustainedCharge == nil, "A hold within the range is not above-limit sustain")
         expect(GlobalSleep.disables == 0, "Firmware control does not inhibit normal sleep")
         SMCComm.writes = []
-        for level: UInt8 in [80, 79, 60, 30, 29] { percentage(level) }
+        for level: UInt8 in [61, 60, 45, 30] { percentage(level) }
+        range(30, 60)
+        expect(SMCComm.writes.isEmpty, "Do not start charging above the minimum")
+        percentage(29)
         range(30, 80)
-        expect(SMCComm.writes.isEmpty, "Firmware owns hysteresis across both bounds")
-        IOPSPrivate.external = false; BTDispatcher.power?(0)
+        SMCComm.writes = []
+        for level: UInt8 in [30, 45, 79] { percentage(level) }
         range(30, 80)
-        expect(BTDispatcher.percent != nil, "Keep limits on unplug and firmware discharge")
-        IOPSPrivate.external = true; BTDispatcher.power?(0)
-        expect(SMCComm.writes.allSatisfy { !$0.0.hasPrefix("CH") }, "Range control never disables adapter")
+        expect(SMCComm.writes.isEmpty, "A charge resumed below the minimum continues to the maximum")
         SMCComm.values["bfF0"] = [0]
         BTPowerEvents.wakeFromSleep()
         range(30, 80)
+        BTPowerEvents.settingsChanged()
+        range(30, 80)
+        percentage(80)
+        range(30, 80)
+        IOPSPrivate.external = false; BTDispatcher.power?(0)
+        range(30, 80)
+        expect(BTDispatcher.percent != nil, "Keep limits on unplug and firmware discharge")
+        percentage(70)
+        IOPSPrivate.external = true; BTDispatcher.power?(0)
+        range(30, 70)
+        expect(SMCComm.writes.allSatisfy { !$0.0.hasPrefix("CH") }, "Range control never disables adapter")
+        SMCComm.values["bfF0"] = [0]
+        BTPowerEvents.wakeFromSleep()
+        range(30, 70)
         expect(GlobalSleep.disables == 0, "Wake preserves clamshell sleep settings")
         let oldValues = SMCComm.values
         IOPSPrivate.reading = nil
         BTPowerEvents.settingsChanged()
         expect(SMCComm.values == oldValues, "Missing telemetry preserves the last good range")
+        percentage(60)
+        range(30, 60)
+        percentage(80)
+        range(30, 60)
+        expect(BTPowerEvents.chargeToLimit(), "Charge-to-limit at the limit keeps the current level")
+        range(30, 80)
+        percentage(60)
         percentage(60)
         expect(BTPowerEvents.chargeToLimit(), "Manual charge to limit")
         range(79, 80)
@@ -98,6 +121,7 @@ enum PowerControlTests {
         percentage(80)
         range(30, 80)
         percentage(60)
+        range(30, 80)
         expect(BTPowerEvents.disableCharging(), "Manual stop")
         range(30, 60)
         percentage(59)
@@ -198,6 +222,23 @@ enum PowerControlTests {
         try BTPowerEvents.start()
         range(30, 87)
         expect(SMCComm.writes.isEmpty, "Restart preserves the installed sustain ceiling")
+        BTPowerEvents.stop()
+
+        // A restart within the range holds the current level instead of
+        // restarting a charge towards the maximum; below the minimum it charges.
+        BTPowerEvents.settingsChanged()
+        SMCComm.fixture()
+        SMCComm.values["bfF0"] = [2]
+        SMCComm.values["bfD0"] = [80, 0, 0, 0]
+        SMCComm.values["bfE0"] = [30, 0, 0, 0]
+        try BTPowerEvents.start()
+        range(30, 60)
+        BTPowerEvents.stop()
+        BTPowerEvents.settingsChanged()
+        SMCComm.fixture()
+        IOPSPrivate.reading = (29, false, false)
+        try BTPowerEvents.start()
+        range(30, 80)
         BTPowerEvents.stop()
 
         // A failed first sustain update must never be advertised as active.
