@@ -163,21 +163,53 @@ DEVELOPER_DIR=/Applications/Xcode-26.3.0.app/Contents/Developer \
   CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build
 ```
 
-That produces an unsigned build for validation. To build an installable app:
+That produces an unsigned build for validation.
 
-1. Open `Battery Toolkit.xcodeproj` in Xcode.
-2. Configure your own development team and Apple Development signing identity
-   for all targets. Set the project build setting `BT_CODESIGN_CN` to the exact
-   Common Name of that certificate. The repository defaults name the upstream
-   developer, whose certificate you cannot use to sign your own build.
-3. Build the **Battery Toolkit** scheme in **Release** configuration. Debug
+### Signing
+
+The app and its privileged helper authenticate each other with a code
+requirement built from two project build settings:
+
+| Setting | Debug | Release |
+| --- | --- | --- |
+| `BT_CODESIGN_CN` | `Apple Development: …` | `Developer ID Application: …` |
+| `BT_CODESIGN_CA_OID` | `1.2.840.113635.100.6.2.1` (Apple Development intermediate) | `1.2.840.113635.100.6.2.6` (Developer ID intermediate) |
+
+Both must match the certificate that actually signs the build. Release is
+signed manually with the Developer ID Application identity, a secure
+timestamp and without the injected `get-task-allow` entitlement, as required
+for notarization. To build with a different identity, change the team, both
+settings and the Release `CODE_SIGN_IDENTITY` accordingly.
+
+### Installing a local build
+
+1. Build the **Battery Toolkit** scheme in **Release** configuration. Debug
    builds deliberately leave charging controls in place when the helper exits.
-4. Disable background activity in the old app before replacing it with the new
-   build, especially when changing the signing identity. Launch the new app,
-   enable its background activity, and approve it in macOS settings if prompted.
-5. Set the thresholds to 30% and 80%, keep the adapter enabled, and disable
+2. Disable background activity in any previously installed build before
+   replacing it, especially when changing the signing identity (Debug and
+   Release use different certificates). Launch the new app, enable its
+   background activity, and approve it in macOS settings if prompted.
+3. Set the thresholds to 30% and 80%, keep the adapter enabled, and disable
    macOS Optimized Battery Charging to avoid competing policies.
 
-Do not replace only the helper inside the upstream signed app: changing its
+### Publishing a release
+
+Store notarization credentials once (run it in Terminal, as it prompts for an
+app-specific password):
+
+```sh
+xcrun notarytool store-credentials <profile> --apple-id <apple-id> --team-id <team-id>
+```
+
+Then build, notarize, staple and package:
+
+```sh
+Tools/release.sh <profile>
+```
+
+The script writes `Battery-Toolkit-Next-<version>.zip`, the matching dSYM
+archive and `SHA256SUMS.txt` to `build/dist/`.
+
+Do not replace only the helper inside a signed app: changing its
 contents invalidates the bundle signature, and mismatched signing identities
 prevent the GUI and helper from authenticating each other.
