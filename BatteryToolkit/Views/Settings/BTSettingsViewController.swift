@@ -26,6 +26,7 @@ internal final class BTSettingsViewController: NSViewController {
     
     @IBOutlet private var adapterSleepSwitch: NSSwitch!
     @IBOutlet private var magSafeSyncSwitch: NSSwitch!
+    @IBOutlet private var keepLimitOnShutdownSwitch: NSSwitch!
     
     private var minChargeVal = BTSettingsInfo.Defaults.minCharge
     @objc private dynamic var minChargeNum: NSNumber {
@@ -118,7 +119,7 @@ internal final class BTSettingsViewController: NSViewController {
             )
         }
         
-        let settings: [String: NSObject & Sendable] = [
+        var settings: [String: NSObject & Sendable] = [
             BTSettingsInfo.Keys.minCharge: self.minChargeNum,
             BTSettingsInfo.Keys.maxCharge: self.maxChargeNum,
             BTSettingsInfo.Keys.adapterSleep: NSNumber(
@@ -128,6 +129,15 @@ internal final class BTSettingsViewController: NSViewController {
                 value: self.magSafeSyncSwitch.state == .on
             ),
         ]
+        //
+        // The daemon only reports this setting when firmware charge limits
+        // are supported.
+        //
+        if self.keepLimitOnShutdownSwitch.isEnabled {
+            settings[BTSettingsInfo.Keys.keepLimitOnShutdown] = NSNumber(
+                value: self.keepLimitOnShutdownSwitch.state == .on
+            )
+        }
         //
         // Submit the settings to the daemon only when they changed.
         //
@@ -226,6 +236,8 @@ internal final class BTSettingsViewController: NSViewController {
             settings[BTSettingsInfo.Keys.adapterSleep] as? NSNumber
             let magSafeSyncNum =
             settings[BTSettingsInfo.Keys.magSafeSync] as? NSNumber
+            let keepLimitOnShutdownNum =
+            settings[BTSettingsInfo.Keys.keepLimitOnShutdown] as? NSNumber
             
             guard let minCharge = minChargeNum?.intValue,
                   let maxCharge = maxChargeNum?.intValue,
@@ -244,6 +256,15 @@ internal final class BTSettingsViewController: NSViewController {
                 self.setMagSafeSync(value: magSafeSync)
             } else {
                 self.magSafeSyncSwitch.isEnabled = false
+            }
+            
+            if let keepLimitOnShutdown = keepLimitOnShutdownNum?.boolValue {
+                self.keepLimitOnShutdownSwitch.isEnabled = true
+                self.keepLimitOnShutdownSwitch.state =
+                    keepLimitOnShutdown ? .on : .off
+            } else {
+                self.keepLimitOnShutdownSwitch.isEnabled = false
+                self.keepLimitOnShutdownSwitch.state = .off
             }
         } catch {
             BTErrorHandler.errorHandler(error: error)

@@ -270,6 +270,34 @@ enum PowerControlTests {
             BTPowerEvents.stop()
             expect(GlobalSleep.count == 0, "Restore sleep after legacy stop")
         }
+
+        // Shutting down clears the firmware range unless asked to keep it.
+        SMCComm.fixture()
+        try BTPowerEvents.start()
+        BTPowerEvents.exit()
+        expect(SMCComm.values["bfF0"] == [0], "Clear the range on exit by default")
+        BTPowerEvents.stop()
+        SMCComm.fixture()
+        BTSettings.keepLimitOnShutdown = true
+        try BTPowerEvents.start()
+        range(30, 60)
+        BTPowerEvents.exit()
+        range(30, 60)
+        BTPowerEvents.stop()
+        expect(SMCComm.values["bfF0"] == [0], "Pausing clears a kept range")
+
+        // Legacy firmware cannot enforce limits while off: always re-enable.
+        for legacy in ["CHTE", "CH0C"] {
+            SMCComm.fixture(firmware: false, legacy: legacy)
+            BTSettings.keepLimitOnShutdown = true
+            try BTPowerEvents.start()
+            percentage(80)
+            expect(BTPowerState.isChargingDisabled(), "Stop at 80 on \(legacy)")
+            BTPowerEvents.exit()
+            expect(!BTPowerState.isChargingDisabled(),
+                   "Re-enable charging on exit on \(legacy)")
+            BTPowerEvents.stop()
+        }
         print("Passed \(checks) power-control checks")
     }
 }

@@ -88,13 +88,13 @@ internal enum BTPowerEvents {
         }
     }
 
-    private static func restoreState() {
+    private static func restoreState(keepFirmwareLimit: Bool = false) {
         //
         // If the daemon is being updated, don't restore the default platform
         // power state.
         //
         if !self.updating {
-            self.restoreDefaults()
+            self.restoreDefaults(keepFirmwareLimit: keepFirmwareLimit)
         }
 
         GlobalSleep.forceRestore()
@@ -107,8 +107,12 @@ internal enum BTPowerEvents {
         guard self.powerCreated else {
             return
         }
-
-        self.restoreState()
+        //
+        // The daemon exits when the Mac shuts down or restarts. If requested,
+        // leave the firmware range installed, so it may keep being enforced
+        // while the Mac is off. Pausing always clears it via stop().
+        //
+        self.restoreState(keepFirmwareLimit: BTSettings.keepsLimitOnExit())
     }
     
     static func stop() {
@@ -411,7 +415,7 @@ internal enum BTPowerEvents {
         GlobalSleep.restore()
     }
 
-    private static func restoreDefaults() {
+    private static func restoreDefaults(keepFirmwareLimit: Bool = false) {
         //
         // Do not reset to defaults when debugging to not stress the batteries
         // of development machines.
@@ -420,7 +424,9 @@ internal enum BTPowerEvents {
             if SMCComm.Power.usesFirmwareChargeLimit {
                 // An active range can currently be charging. Always clear it,
                 // regardless of the cached chargingDisabled flag.
-                _ = SMCComm.Power.clearFirmwareChargeLimit()
+                if !keepFirmwareLimit {
+                    _ = SMCComm.Power.clearFirmwareChargeLimit()
+                }
             } else {
                 let (percent, _, _) = BTPowerState.getPercentRemaining()
                 _ = BTPowerState.enableCharging(percent: percent)
