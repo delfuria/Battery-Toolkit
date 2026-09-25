@@ -3,3 +3,4 @@ Battery Toolkit.xcodeproj/project.xcworkspace/xcuserdata/
 build/
 .build/
 .tokensave/
+.DS_Store
