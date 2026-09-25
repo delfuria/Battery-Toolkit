@@ -4,14 +4,15 @@
 #
 # Usage: Tools/release.sh [keychain-profile]
 #
-# The keychain profile (default: BT-notary) must have been created with:
-#   xcrun notarytool store-credentials BT-notary \
+# The keychain profile (default: BatteryToolkit-notary) must have been
+# created with:
+#   xcrun notarytool store-credentials BatteryToolkit-notary \
 #       --apple-id <apple-id> --team-id VZWMBQL256
 #
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-profile="${1:-BT-notary}"
+profile="${1:-BatteryToolkit-notary}"
 app_name="Battery Toolkit Next"
 derived="build/release-dd"
 products="$derived/Build/Products/Release"
