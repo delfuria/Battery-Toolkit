@@ -65,7 +65,6 @@ public enum SMCComm {
         IOPSPrivate.reading = (60, false, false)
         IOPSPrivate.external = true
         BTSettings.minCharge = 30; BTSettings.maxCharge = 80
-        BTSettings.keepLimitOnShutdown = false
     }
 }
 
@@ -81,8 +80,6 @@ public enum SMCComm {
     static var maxCharge: UInt8 = 80
     static let adapterSleep = false
     static let magSafeSync = false
-    static var keepLimitOnShutdown = false
-    static func keepsLimitOnExit() -> Bool { keepLimitOnShutdown }
 }
 
 @MainActor enum GlobalSleep {

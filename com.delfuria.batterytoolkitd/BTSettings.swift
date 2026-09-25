@@ -12,8 +12,6 @@ internal enum BTSettings {
     private(set) static var maxCharge = BTSettingsInfo.Defaults.maxCharge
     private(set) static var adapterSleep = BTSettingsInfo.Defaults.adapterSleep
     private(set) static var magSafeSync = BTSettingsInfo.Defaults.magSafeSync
-    private(set) static var keepLimitOnShutdown =
-        BTSettingsInfo.Defaults.keepLimitOnShutdown
 
     static func readDefaults() {
         self.adapterSleep = UserDefaults.standard.bool(
@@ -21,9 +19,6 @@ internal enum BTSettings {
         )
         self.magSafeSync = UserDefaults.standard.bool(
             forKey: BTSettingsInfo.Keys.magSafeSync
-        )
-        self.keepLimitOnShutdown = UserDefaults.standard.bool(
-            forKey: BTSettingsInfo.Keys.keepLimitOnShutdown
         )
 
         let minCharge = UserDefaults.standard.integer(
@@ -60,30 +55,8 @@ internal enum BTSettings {
         UserDefaults.standard.removeObject(
             forKey: BTSettingsInfo.Keys.maxCharge
         )
-        UserDefaults.standard.removeObject(
-            forKey: BTSettingsInfo.Keys.keepLimitOnShutdown
-        )
-        //
-        // The daemon is about to be disabled. Never leave a charge limit
-        // behind once it has stopped.
-        //
-        self.keepLimitOnShutdown = false
 
         _ = CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication)
-    }
-
-    static func keepsLimitOnExit() -> Bool {
-        guard self.keepLimitOnShutdown else {
-            return false
-        }
-        //
-        // Uninstallation may delete the preferences right before terminating
-        // the daemon, so do not trust the cached value alone.
-        //
-        _ = CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication)
-        return UserDefaults.standard.bool(
-            forKey: BTSettingsInfo.Keys.keepLimitOnShutdown
-        )
     }
 
     static func getSettings() -> [String: NSObject & Sendable] {
@@ -100,13 +73,6 @@ internal enum BTSettings {
         if SMCComm.MagSafe.supported {
             settings.updateValue(magSafeSync,
                 forKey: BTSettingsInfo.Keys.magSafeSync)
-        }
-        //
-        // Only firmware charge limits can be enforced while the Mac is off.
-        //
-        if SMCComm.Power.usesFirmwareChargeLimit {
-            settings.updateValue(NSNumber(value: self.keepLimitOnShutdown),
-                forKey: BTSettingsInfo.Keys.keepLimitOnShutdown)
         }
 
         return settings
@@ -146,14 +112,6 @@ internal enum BTSettings {
             BTSettingsInfo.Defaults.magSafeSync
 
         self.setMagSafeSync(enabled: magSafeSync)
-
-        let keepLimitOnShutdownNum =
-            settings[BTSettingsInfo.Keys.keepLimitOnShutdown] as? NSNumber
-        let keepLimitOnShutdown = keepLimitOnShutdownNum?.boolValue ??
-            BTSettingsInfo.Defaults.keepLimitOnShutdown
-
-        self.keepLimitOnShutdown = SMCComm.Power.usesFirmwareChargeLimit &&
-            keepLimitOnShutdown
 
         self.writeDefaults()
 
@@ -225,10 +183,6 @@ internal enum BTSettings {
         UserDefaults.standard.set(
             self.magSafeSync,
             forKey: BTSettingsInfo.Keys.magSafeSync
-        )
-        UserDefaults.standard.set(
-            self.keepLimitOnShutdown,
-            forKey: BTSettingsInfo.Keys.keepLimitOnShutdown
         )
         //
         // As NSUserDefaults are not automatically synchronized without

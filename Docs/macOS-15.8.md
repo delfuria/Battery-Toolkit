@@ -75,20 +75,17 @@ continues to 83%, also across wake and settings changes, as with the legacy
 switch. Reconnecting power ends a resumed charge, again as before. The menu
 shows “Sustaining near …” only for holds above the configured maximum.
 
-## Keeping the limit while shut down
+## No limit while shut down
 
-By default the daemon clears the firmware range when it exits, so a Mac that
-is shut down charges to 100%. The optional “Keep charge limit while shut down”
-setting leaves the installed range in place when the daemon exits on shutdown
-or restart, so the SMC may keep enforcing it while the Mac is off. Whether the
-SMC actually retains `bfF0`/`bfD0`/`bfE0` across a full power-off has **not**
-been verified yet.
-
-The setting is only offered when the firmware range keys are in use. Macs that
-use the legacy keys (`CHTE`, `CH0B`/`CH0C`) always re-enable charging on exit,
-as before. Pausing power management always clears the range. Uninstalling from
-the app, or with `uninstall.sh`, deletes the daemon's preferences before it
-stops, and the daemon re-reads them on exit, so no range is left behind.
+The firmware range does not survive a full power-off. Version 2.0.2 offered an
+option to leave `bfF0`/`bfD0`/`bfE0` installed when the daemon exits on
+shutdown. In a hardware test with the option enabled and a 20–83% range, a Mac
+shut down at 35% with the adapter connected was at 94% after one hour, above
+the programmed upper bound. The SMC therefore resets the range while the Mac is
+off, and the option was removed in 2.0.3. The daemon again clears the range on
+exit, so a Mac that is shut down with the adapter connected charges to 100%.
+Sleep keeps the range enforced; use sleep, or disconnect the adapter, instead
+of shutting down.
 
 ## Adapter power and clamshell mode
 
