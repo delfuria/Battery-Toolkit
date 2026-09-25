@@ -9,17 +9,17 @@
 		<key>SuccessfulExit</key>
 		<false/>
 	</dict>
-	<key>BundleProgram</key>
-	<string>Contents/Library/LaunchServices/me.mhaeuser.batterytoolkitd</string>
+	<key>AssociatedBundleIdentifiers</key>
+	<string>com.delfuria.BatteryToolkit</string>
 	<key>Label</key>
-	<string>me.mhaeuser.batterytoolkitd</string>
+	<string>com.delfuria.batterytoolkitd</string>
 	<key>RunAtLoad</key>
 	<true/>
 	<key>EnableTransactions</key>
 	<false/>
 	<key>MachServices</key>
 	<dict>
-		<key>EMH49F8A2Y.me.mhaeuser.batterytoolkitd</key>
+		<key>VZWMBQL256.com.delfuria.batterytoolkitd</key>
 		<true/>
 	</dict>
 </dict>
